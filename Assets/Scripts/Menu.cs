@@ -8,21 +8,25 @@ public class Menu : MonoBehaviour
     private MenuState menuState;
 
     GameObject currentMenuItemsSet;
-    GameObject wrapperPrefab, buttonPrefab;
+    GameObject MANAGER, wrapperPrefab, buttonPrefab;
+    Texture2D defaultTexture;
 
     //string[] MenuItems = { "" };
     string[] MainMenuItems = { "Play", "Options", "Exit" };
-    string[] OptionsMenuItems = { "Audio", "Video" };
+    string[] OptionsMenuItems = { "Audio", "Video", "Back" };
+    string[] AudioMenuItems = { "Volume", "Back" };
+    string[] VideoMenuItems = { "Resolution", "Back" };
 
 	void Awake ()
 	{
         wrapperPrefab = MenuManager.Instance.GetWrapperPrefab();
         buttonPrefab = MenuManager.Instance.GetButtonPrefab();
+        defaultTexture = Resources.Load("ButtonTextures/_Default") as Texture2D;
 
         if (buttonPrefab != null)
             Debug.Log("SUCCESS: Retrieved button prefab!");
 
-        this.menuState = MainMenu;
+        this.menuState = Main;
         CreateMenu(MainMenuItems);
 	}
 
@@ -31,15 +35,15 @@ public class Menu : MonoBehaviour
         this.menuState();
 	}
 
-    public void MainMenu()
+    public void Main()
     {
         if (MenuManager.Instance.clickedObject)
         {
             if (MenuManager.Instance.clickedObject.name == "Options")
             {
                 Destroy(currentMenuItemsSet);
-                this.menuState = Options;
                 CreateMenu(OptionsMenuItems);
+                this.menuState = Options;
             }
         }
     }
@@ -49,14 +53,42 @@ public class Menu : MonoBehaviour
         if (MenuManager.Instance.clickedObject)
         {
             if (MenuManager.Instance.clickedObject.name == "Audio")
-            {
-                Destroy(currentMenuItemsSet);
-                Debug.Log("AUDIO!");
-            }
+                NewMenuState(AudioMenuItems, Audio);
+
+            if (MenuManager.Instance.clickedObject.name == "Video")
+                NewMenuState(VideoMenuItems, Video);
+
+            if (MenuManager.Instance.clickedObject.name == "Back")
+                NewMenuState(MainMenuItems, Main);
+        }
+    }
+
+    public void Audio()
+    {
+        if (MenuManager.Instance.clickedObject)
+        {
+            if (MenuManager.Instance.clickedObject.name == "Back")
+                NewMenuState(OptionsMenuItems, Options);
+        }
+    }
+
+    public void Video()
+    {
+        if (MenuManager.Instance.clickedObject)
+        {
+            if (MenuManager.Instance.clickedObject.name == "Back")
+                NewMenuState(OptionsMenuItems, Options);
         }
     }
 
     // ----------------------------------------------------------------------
+
+    void NewMenuState(string[] MenuItems, MenuState Menu)
+    {
+        Destroy(currentMenuItemsSet);
+        CreateMenu(MenuItems);
+        this.menuState = Menu;
+    }
 
     void CreateMenu(string[] MenuItemsList)
     {
@@ -69,7 +101,10 @@ public class Menu : MonoBehaviour
             Button.name = MenuItemsList[i];
             Button.transform.parent = currentMenuItemsSet.transform;
             Texture2D tex = Resources.Load("ButtonTextures/" + Button.name) as Texture2D;
-            Button.renderer.material.mainTexture = tex;
+            if (tex)
+                Button.renderer.material.mainTexture = tex;
+            else if (defaultTexture)
+                Button.renderer.material.mainTexture = defaultTexture;
         }
     }
 }

@@ -17,6 +17,12 @@ public class Raycaster : MonoBehaviour
     {
         get
         {
+            if (applicationIsQuitting)
+            {
+                Debug.LogWarning("Raycaster Instance already destroyed on application quit." +
+                    " Won't create again - returning null.");
+                return null;
+            }
             if (instance == null)
                 instance = (Raycaster)GameObject.FindObjectOfType(typeof(Raycaster));
 
@@ -29,7 +35,10 @@ public class Raycaster : MonoBehaviour
             return instance;
         }
     }
+
+    private static bool applicationIsQuitting = false;
     // Monobehaviour Singleton End
+
 
     public delegate void OnClickEvent(GameObject g);
     public event OnClickEvent OnClick;
@@ -39,10 +48,17 @@ public class Raycaster : MonoBehaviour
         Ray r = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit h;
 
-        if (Physics.Raycast(r, out h, 100))
+        if (Input.GetMouseButtonUp(0))
         {
-            if (Input.GetMouseButtonUp(0))
+            if (Physics.Raycast(r, out h, 100))
+            {
                 OnClick(h.transform.gameObject);
+            }
         }
+    }
+
+    public void OnDestroy()
+    {
+        applicationIsQuitting = true;
     }
 }

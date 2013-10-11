@@ -24,6 +24,7 @@ public class Menu : MonoBehaviour
 
 	void Awake ()
 	{
+        useGUILayout = false;
         wrapperPrefab = MenuManager.Instance.GetWrapperPrefab();
         buttonPrefab = MenuManager.Instance.GetButtonPrefab();
         defaultTexture = Resources.Load("ButtonTextures/_Default") as Texture2D;    // For untextured items

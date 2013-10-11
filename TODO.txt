@@ -1,0 +1,7 @@
+- Ensure it works depth wise in a populated scene
+- Add sliders
+- Add some proper options
+- Add rollover effects
+- Add fade in/out or other effect
+- Make some skins
+- Make more complex mesh geometry
